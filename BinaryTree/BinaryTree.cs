@@ -1,4 +1,8 @@
-  public class TreeNode {
+using System;
+using System.Text;
+using System.Linq;
+
+public class TreeNode {
       public int val;
       public TreeNode left;
       public TreeNode right;
@@ -12,17 +16,21 @@ public class Codec {
     // Encodes a tree to a single string.
     public string serialize(TreeNode root) {
         var depth = FindDepth(root, 0);
-        
+
+        if (depth == 0) {
+            return nullString;
+        }
+
         var sb = new StringBuilder();
         AppendValue(root, sb);
-        stringify(root, sb, 0, depth);
+        var res = stringify(root, sb, 1, depth);
         sb.Remove(sb.Length - 1, 1);
-        return sb.ToString();
+        return res;
     }
     
-    private void stringify(TreeNode node, StringBuilder sb, int curDepth, int depth) {
+    private string stringify(TreeNode node, StringBuilder sb, int curDepth, int depth) {
         if (curDepth == depth) {
-            return;
+            return String.Empty;
         }
         
         TreeNode left = null;
@@ -35,8 +43,15 @@ public class Codec {
         
         AppendValue(left, sb);
         AppendValue(right, sb);
-        stringify(left, sb, curDepth + 1, depth);
-        stringify(right, sb, curDepth + 1, depth);
+        Console.WriteLine($"L+R Appended. curDepth: {curDepth}. {sb}");
+
+        sb.Append(stringify(left, new StringBuilder(), curDepth + 1, depth));
+        Console.WriteLine($"LeftTree Appended. curDepth: {curDepth}. {sb}");
+        sb.Append(stringify(right, new StringBuilder(), curDepth + 1, depth));
+        Console.WriteLine($"LeftTree Appended. curDepth: {curDepth}. {sb}");
+        
+        Console.WriteLine($"Returning. curDepth: {curDepth}. {sb}");
+        return sb.ToString();
     }
     
     private void AppendValue(TreeNode node, StringBuilder sb) {
