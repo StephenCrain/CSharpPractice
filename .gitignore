@@ -1,9 +1,2 @@
-BinaryTree/obj/BinaryTree.csproj.nuget.g.props
-BinaryTree/obj/BinaryTree.csproj.nuget.cache
-BinaryTree/obj/BinaryTree.csproj.nuget.g.targets
-BinaryTree/obj/Debug/netcoreapp2.2/BinaryTree.csproj.FileListAbsolute.txt
-BinaryTree/obj/Debug/netcoreapp2.2/BinaryTree.AssemblyInfo.cs
-BinaryTree/obj/Debug/netcoreapp2.2/BinaryTree.AssemblyInfoInputs.cache
-BinaryTree/obj/Debug/netcoreapp2.2/BinaryTree.assets.cache
-BinaryTree/obj/Debug/netcoreapp2.2/BinaryTree.csproj.CoreCompileInputs.cache
-BinaryTree/obj/Debug/netcoreapp2.2/BinaryTree.csprojAssemblyReference.cache
+BinaryTree/obj/**
+BinaryTree/bin/**
