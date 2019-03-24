@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Linq;
+using System.Collections.Generic;
 
 public class TreeNode {
       public int val;
@@ -11,47 +12,56 @@ public class TreeNode {
  
 
 public class Codec {
-    private const string nullString = "null";
+    private const string nullString = "X";
     
     // Encodes a tree to a single string.
-    public string serialize(TreeNode root) {
-        var depth = FindDepth(root, 0);
-
-        if (depth == 0) {
+     public string serialize(TreeNode root) {
+        if (root == null) {
             return nullString;
         }
-
+        
+        var levels = new List<List<TreeNode>>();
+        levels.Add(new List<TreeNode>(1));
+        levels[0].Add(root);
+        
+        levelOrder(root, levels, 1);
+        
         var sb = new StringBuilder();
-        AppendValue(root, sb);
-        var res = stringify(root, sb, 1, depth);
+        
+        // last level will be all nulls;
+        levels.RemoveAt(levels.Count - 1);
+
+        // remove trailing nulls from real last level.
+        var lastLevel = levels[levels.Count - 1];
+        for (int i = lastLevel.Count - 1; i >= 0; i--) {
+            if (lastLevel[i] == null) {
+                lastLevel.RemoveAt(i);
+            } else {
+                break;
+            }
+        }
+
+        levels.ForEach(level => level.ForEach(node => AppendValue(node, sb)));
+        
         sb.Remove(sb.Length - 1, 1);
-        return res;
+        return sb.ToString();
     }
     
-    private string stringify(TreeNode node, StringBuilder sb, int curDepth, int depth) {
-        if (curDepth == depth) {
-            return String.Empty;
+    private void levelOrder(TreeNode node, List<List<TreeNode>> levels, int curDepth) {
+        if (levels.Count == curDepth) {
+            levels.Add(new List<TreeNode>());
         }
         
-        TreeNode left = null;
-        TreeNode right = null;
+        levels[curDepth].Add(node.left);
+        levels[curDepth].Add(node.right);
         
-        if (node != null) {
-            left = node.left;
-            right = node.right;
+        if (node.left != null) {
+            levelOrder(node.left, levels, curDepth + 1);
         }
         
-        AppendValue(left, sb);
-        AppendValue(right, sb);
-        Console.WriteLine($"L+R Appended. curDepth: {curDepth}. {sb}");
-
-        sb.Append(stringify(left, new StringBuilder(), curDepth + 1, depth));
-        Console.WriteLine($"LeftTree Appended. curDepth: {curDepth}. {sb}");
-        sb.Append(stringify(right, new StringBuilder(), curDepth + 1, depth));
-        Console.WriteLine($"LeftTree Appended. curDepth: {curDepth}. {sb}");
-        
-        Console.WriteLine($"Returning. curDepth: {curDepth}. {sb}");
-        return sb.ToString();
+        if (node.right != null) {
+            levelOrder(node.right, levels, curDepth + 1);
+        }
     }
     
     private void AppendValue(TreeNode node, StringBuilder sb) {
@@ -93,12 +103,12 @@ public class Codec {
         int leftIndex = (index * 2) + 1;
         int rightIndex = (index * 2) + 2;
 
-        if (leftIndex < nodes.Length && nodes[leftIndex].HasValue) {
+        if (nodes[leftIndex].HasValue) {
             node.left = new TreeNode(nodes[leftIndex].Value);
             treeify(node.left, nodes, leftIndex);
         }
         
-        if (rightIndex < nodes.Length && nodes[rightIndex].HasValue) {
+        if (nodes[rightIndex].HasValue) {
             node.right = new TreeNode(nodes[rightIndex].Value);
             treeify(node.right, nodes, rightIndex);
         }
