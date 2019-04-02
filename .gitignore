@@ -3,3 +3,5 @@ BinaryTree/bin/**
 LevelOrderTraversal/obj/**
 LevelOrderTraversal/bin/
 BinaryTree/obj/project.assets.json
+Sorting/obj/**
+Sorting/bin/**
