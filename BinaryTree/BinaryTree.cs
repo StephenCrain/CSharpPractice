@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ public class TreeNode {
  
 
 public class Codec {
-    private const string nullString = "X";
+    private const string nullString = "X,";
     
     // Encodes a tree to a single string.
      public string serialize(TreeNode root) {
@@ -65,8 +66,8 @@ public class Codec {
     }
     
     private void AppendValue(TreeNode node, StringBuilder sb) {
-        string val = node != null ? node.val.ToString() : nullString;
-        sb.Append($"{val},");
+        string val = node != null ? node.val.ToString("0','", CultureInfo.InvariantCulture) : nullString;
+        sb.Append(val);
     }
     
     private int FindDepth(TreeNode node, int currentDepth) {
@@ -82,36 +83,38 @@ public class Codec {
 
     // Decodes your encoded data to tree.
     public TreeNode deserialize(string data) {
-        int?[] nodes = data.Split(",").Select(node => {
-            try {
-                return new Nullable<int>(Int32.Parse(node));
-            } catch {
-                return null;
-            }
-        }).ToArray();
+        TreeNode[] nodes = data.Split(",").Select(stringVal => Int32.TryParse(stringVal, out int val) ? new TreeNode(val) : null).ToArray();
         
-        if (!nodes[0].HasValue) {
+        if (nodes.Length == 0 || nodes[0] == null) {
             return null;
         }
-        
-        var root = new TreeNode(nodes[0].Value);
-        treeify(root, nodes, 0);
-        return root;
-    }
-    
-    private void treeify(TreeNode node, int?[] nodes, int index) {
-        int leftIndex = (index * 2) + 1;
-        int rightIndex = (index * 2) + 2;
 
-        if (nodes[leftIndex].HasValue) {
-            node.left = new TreeNode(nodes[leftIndex].Value);
-            treeify(node.left, nodes, leftIndex);
+        // increment offSet by two each time we hit a null.
+        // for each null we are missing two nodes in the next level.
+        int offSet = 0;
+
+        // set up the pointers
+        for (int i = 0; i < nodes.Length; i++) {
+            var curNode = nodes[i];
+            
+            if (curNode == null) {
+                offSet += 2;
+                continue;
+            }
+
+            int leftIndex = i * 2 + 1 - offSet;
+            if (leftIndex < nodes.Length) {
+                curNode.left = nodes[leftIndex];
+            }
+
+            int rightIndex = i * 2 + 2 - offSet;
+            if (rightIndex < nodes.Length) {
+                curNode.right = nodes[rightIndex];
+            }
         }
         
-        if (nodes[rightIndex].HasValue) {
-            node.right = new TreeNode(nodes[rightIndex].Value);
-            treeify(node.right, nodes, rightIndex);
-        }
+        
+        return nodes[0];
     }
 }
 

@@ -8,7 +8,8 @@ namespace myApp
         {
             var root = BuildTree2();
             Codec codec = new Codec();
-            codec.deserialize(codec.serialize(root));
+            root = codec.deserialize(codec.serialize(root));
+            Console.WriteLine(root.val);
         }
 
         static TreeNode BuildTree() {
